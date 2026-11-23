@@ -11,6 +11,10 @@ JOKE = (
     "My agent rehearsed the demo 40 times; "
     "on stage, it typed the admin password into the search box."
 )
+# Gate limit in one place so a future joke edit cannot silently drift
+# past the 280-code-point gate in RULES.txt.
+MAX_CHARS = 280
+
 # The punchline is the oldest demo-gods truth there is: it works in every
 # rehearsal and fails live, in front of the room, in the most visible way —
 # the secret lands in the search box while everyone watches.
@@ -23,8 +27,10 @@ def validate(text: str) -> str:
     and the text must be a single non-blank line of 1-280 code points.
     """
     cleaned = text.strip()
-    if not 1 <= len(cleaned) <= 280:
-        raise ValueError("joke must be 1-280 characters, got %d" % len(cleaned))
+    if not 1 <= len(cleaned) <= MAX_CHARS:
+        raise ValueError(
+            "joke must be 1-%d characters, got %d" % (MAX_CHARS, len(cleaned))
+        )
     if cleaned == "":
         raise ValueError("joke must not be whitespace only")
     if "\n" in cleaned or "\r" in cleaned:
